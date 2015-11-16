@@ -13,5 +13,37 @@ namespace ShopSite
         {
 
         }
+
+        protected void searchBtn_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("search.aspx");
+        }
+
+        protected void Button15_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
+        }
+
+        protected void insertBtn_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("insert.aspx");
+        }
+
+        protected void updateBtn_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("update.aspx");
+        }
+
+        protected void deleteBtn_Click(object sender, EventArgs e)
+        {
+            Response.Redirect("delete.aspx");
+        }
+
+
+
+        protected void ImageButton1_Click(object sender, ImageClickEventArgs e)
+        {
+            Response.Redirect("https://www.youtube.com/watch?v=2G2w77jrayw");
+        }
     }
 }

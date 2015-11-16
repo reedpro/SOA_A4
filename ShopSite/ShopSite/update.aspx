@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="search.aspx.cs" Inherits="ShopSite.search" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeBehind="update.aspx.cs" Inherits="ShopSite.update" %>
 
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -20,8 +20,8 @@
     </style>
 </head>
 <body>
-    <form id="form1" runat="server">
-    <div>
+ <form id="form1" runat="server">
+
     
     <div style="float: left; width: 101%; text-align: center;">
         <img class="auto-style1" src="assets/banner.PNG" /></div>
@@ -30,9 +30,6 @@
         <p style="text-align: center">
             &nbsp;&nbsp;<asp:Label ID="errLbl" runat="server" ForeColor="Red"></asp:Label>
         </p>
-        <asp:Panel ID="Panel1" runat="server" Style="left: 50%; margin-left: 432px; text-align: center;" Width="579px" BorderStyle="Solid">
-            <asp:CheckBox ID="CheckBox1" runat="server"  TextAlign="Left" Text="Please generate a Purchase Order (P.O)" />
-        </asp:Panel>
         <br />
         <br />
         <asp:Panel ID="custPnl" runat="server" BorderStyle="Solid">
@@ -114,4 +111,6 @@
     </form>
     </body>
 </html>
+
+
 
