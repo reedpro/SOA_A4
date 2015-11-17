@@ -97,11 +97,11 @@
         <p class="auto-style2">
             &nbsp;</p>
         <p class="auto-style2">
-            <asp:Button ID="backBtn" runat="server" BackColor="#0000CC" BorderColor="Black" ForeColor="White" Height="42px" style="text-align: center" Text="Go Back" Width="122px" OnClick="backBtn_Click" TabIndex="2" />
+            <asp:Button ID="backBtn" runat="server" BackColor="#0000CC" BorderColor="Black" ForeColor="White" Height="42px" style="text-align: center" Text="Go Back" Width="122px" OnClick="backBtn_Click" />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <asp:Button ID="excecuteBtn" runat="server" BackColor="#0000CC" BorderColor="Black" ForeColor="White" Height="42px" style="text-align: center" Text="Execute" Width="122px" OnClick="excecuteBtn_Click" TabIndex="1"  />
+            <asp:Button ID="excecuteBtn" runat="server" BackColor="#0000CC" BorderColor="Black" ForeColor="White" Height="42px" style="text-align: center" Text="Execute" Width="122px" OnClick="excecuteBtn_Click"  />
         &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-            <asp:Button ID="Button15" runat="server" BackColor="#0000CC" BorderColor="Black" ForeColor="White" Height="42px" style="text-align: center" Text="Get me outta here !" Width="122px" OnClick="Button15_Click" TabIndex="3" />
+            <asp:Button ID="Button15" runat="server" BackColor="#0000CC" BorderColor="Black" ForeColor="White" Height="42px" style="text-align: center" Text="Get me outta here !" Width="122px" OnClick="Button15_Click" />
         </p>
             <div style="float: left; width: 101%; text-align: right;">
                 <img class="auto-style3" src="assets/girl.PNG" />

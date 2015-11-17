@@ -20,7 +20,7 @@ namespace ShopSite
     public partial class search : System.Web.UI.Page
     {
         private static readonly Regex phoneNumber = new Regex(@"\d{3}-\d{3}-\d{4}");
-
+        public string port = "54510";
 
         protected void Page_Load(object sender, EventArgs e)
         {
@@ -104,7 +104,7 @@ namespace ShopSite
                     //check custID to see if it is valid and non-blank
                     if (custIDTxt.Text != "" && Regex.IsMatch(custIDTxt.Text, @"^[1-9]?$"))
                     {
-                        getString += "custID:" + custIDTxt.Text;
+                        getString += custIDTxt.Text;
                     } 
                     else if (!Regex.IsMatch(custIDTxt.Text, @"^[1-9]?$")) //if it is non-blank and invalid add to error string
                     {
@@ -115,9 +115,9 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ","; //add comma to "get" string
+                            getString += " "; //add comma to "get" string
                         }
-                        getString += "firstName:" + firstNameTxt.Text;
+                        getString += firstNameTxt.Text;
                     }
                     else if (Regex.IsMatch(firstNameTxt.Text, @"\d"))
                     {
@@ -128,9 +128,9 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "lastName:" + lastNameTxt.Text;
+                        getString += lastNameTxt.Text;
                     }
                     else if (Regex.IsMatch(lastNameTxt.Text, @"\d"))
                     {
@@ -141,9 +141,9 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "phoneNumber:" + phoneTxt.Text;
+                        getString += phoneTxt.Text;
                     }
                     else if (!phoneNumber.IsMatch(phoneTxt.Text) && phoneTxt.Text != "")
                     {
@@ -161,7 +161,7 @@ namespace ShopSite
                         {
                             string content;
                             string Method = "get";
-                            string uri = "http://localhost:54510/RestService"; 
+                            string uri = "http://localhost:" + port + "/RestService/" + getString; 
 
                             HttpWebRequest req = WebRequest.Create(uri) as HttpWebRequest;
                             req.KeepAlive = false;
@@ -203,6 +203,7 @@ namespace ShopSite
                     //getString;
                 }
             }
+            //search product
             else if (prodSearch)
             {
                 if (custSearch || ordSearch || cartSearch)
@@ -211,9 +212,10 @@ namespace ShopSite
                 }
                 else
                 {
+                    //if product text is nonblank and valid
                     if (prodIDTxt.Text != "" && Regex.IsMatch(custIDTxt.Text, @"^[1-9]?$"))
                     {
-                        getString += "prodID:" + prodIDTxt.Text;
+                        getString += prodIDTxt.Text;
                     }
                     else if (!Regex.IsMatch(prodIDTxt.Text, @"^[1-9]?$"))
                     {
@@ -224,9 +226,9 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "prodName:" + prodNameTxt.Text;
+                        getString += prodNameTxt.Text;
                     }
                     else if (Regex.IsMatch(prodNameTxt.Text, @"\d"))
                     {
@@ -237,9 +239,9 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "price:" + priceTxt.Text;
+                        getString += priceTxt.Text;
                     }
                     else if (Regex.IsMatch(priceTxt.Text, @"^[1-9]\d*(\.\d+)?$"))
                     {
@@ -250,9 +252,9 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "prodWeight:" + prodWeightTxt.Text;
+                        getString += prodWeightTxt.Text;
                     }
                     else if (!Regex.IsMatch(prodWeightTxt.Text, @"^[1-9]\d*(\.\d+)?$"))
                     {
@@ -261,6 +263,37 @@ namespace ShopSite
                     if (errMsg != "")
                     {
                         errLbl.Text = errMsg + "\n" + getString;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            string content;
+                            string Method = "get";
+                            string uri = "http://localhost:" + port + "/product/" + getString;
+
+                            HttpWebRequest req = WebRequest.Create(uri) as HttpWebRequest;
+                            req.KeepAlive = false;
+                            req.Method = Method.ToUpper();
+
+                            HttpWebResponse resp = req.GetResponse() as HttpWebResponse;
+
+                            Encoding enc = System.Text.Encoding.GetEncoding(1252);
+                            StreamReader loResponseStream =
+                            new StreamReader(resp.GetResponseStream(), enc);
+
+                            string Response = loResponseStream.ReadToEnd();
+
+
+                            loResponseStream.Close();
+                            resp.Close();
+                            errLbl.Text = Response.ToString(); //show response
+
+                        }
+                        catch (Exception ex)
+                        {
+                            errLbl.Text = ex.Message.ToString();
+                        }
                     }
                 }
             }
@@ -274,7 +307,7 @@ namespace ShopSite
                 {
                     if (orderIDTxt.Text != "" && Regex.IsMatch(orderIDTxt.Text, @"^[1-9]?$"))
                     {
-                        getString += "prodID:" + prodIDTxt.Text;
+                        getString += prodIDTxt.Text;
                     }
                     else if (!Regex.IsMatch(orderIDTxt.Text, @"^[1-9]?$"))
                     {
@@ -285,9 +318,9 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "custID:" + ordCustIDTxt.Text;
+                        getString += ordCustIDTxt.Text;
                     }
                     else if (!Regex.IsMatch(ordCustIDTxt.Text, @"^[1-9]?$"))
                     {
@@ -298,11 +331,11 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
                         if (errMsg != "")
                         {
-                            getString += "poNumber:" + poNumberTxt.Text;
+                            getString += poNumberTxt.Text;
                         }
                     }
 
@@ -313,13 +346,48 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "orderDate:" + orderDateTxt.Text;
+                        getString += orderDateTxt.Text;
                     }
                     else if (!DateTime.TryParseExact(orderDateTxt.Text, format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out temp))
                     {
                         errMsg += "date must be in MM-DD-YY format. ";
+                    }
+                }
+                if(errMsg!= "")
+                {
+                    errLbl.Text = errMsg;
+                }
+                else
+                {
+                    try
+                    {
+                        string content;
+                        string Method = "get";
+                        string uri = "http://localhost:" + port + "/order/" + getString;
+
+                        HttpWebRequest req = WebRequest.Create(uri) as HttpWebRequest;
+                        req.KeepAlive = false;
+                        req.Method = Method.ToUpper();
+
+                        HttpWebResponse resp = req.GetResponse() as HttpWebResponse;
+
+                        Encoding enc = System.Text.Encoding.GetEncoding(1252);
+                        StreamReader loResponseStream =
+                        new StreamReader(resp.GetResponseStream(), enc);
+
+                        string Response = loResponseStream.ReadToEnd();
+
+
+                        loResponseStream.Close();
+                        resp.Close();
+                        errLbl.Text = Response.ToString(); //show response
+
+                    }
+                    catch (Exception ex)
+                    {
+                        errLbl.Text = ex.Message.ToString();
                     }
                 }
             }
@@ -333,7 +401,7 @@ namespace ShopSite
                 {
                     if (cartOrderIDTxt.Text != "" && Regex.IsMatch(cartOrderIDTxt.Text, @"^[1-9]?$"))
                     {
-                        getString += "prodID:" + prodIDTxt.Text;
+                        getString += prodIDTxt.Text;
                     }
                     else if (!Regex.IsMatch(cartOrderIDTxt.Text, @"^[1-9]?$"))
                     {
@@ -344,9 +412,9 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "prodID:" + cartProdIDTxt.Text;
+                        getString += cartProdIDTxt.Text;
                     }
                     else if (!Regex.IsMatch(cartProdIDTxt.Text, @"^[1-9]?$"))
                     {
@@ -357,14 +425,49 @@ namespace ShopSite
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += " ";
                         }
-                        getString += "quantity:" + quantityTxt.Text;
+                        getString += quantityTxt.Text;
                     }
                     else if (!int.TryParse(quantityTxt.Text, out i))
                     {
                         errMsg += "quantity must be numeric. ";
                     }
+                }
+                if(errMsg != "")
+                {
+                    try
+                    {
+                        string content;
+                        string Method = "get";
+                        string uri = "http://localhost:" + port + "/cart/" + getString;
+
+                        HttpWebRequest req = WebRequest.Create(uri) as HttpWebRequest;
+                        req.KeepAlive = false;
+                        req.Method = Method.ToUpper();
+
+                        HttpWebResponse resp = req.GetResponse() as HttpWebResponse;
+
+                        Encoding enc = System.Text.Encoding.GetEncoding(1252);
+                        StreamReader loResponseStream =
+                        new StreamReader(resp.GetResponseStream(), enc);
+
+                        string Response = loResponseStream.ReadToEnd();
+
+
+                        loResponseStream.Close();
+                        resp.Close();
+                        errLbl.Text = Response.ToString(); //show response
+
+                    }
+                    catch (Exception ex)
+                    {
+                        errLbl.Text = ex.Message.ToString();
+                    }
+                }
+                else
+                {
+                    errLbl.Text = errMsg;
                 }
             }
         }
