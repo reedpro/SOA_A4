@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
+using System.Net;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
@@ -11,6 +14,8 @@ namespace ShopSite
     public partial class insert : System.Web.UI.Page
     {
         private static readonly Regex phoneNumber = new Regex(@"\d{3}-\d{3}-\d{4}");
+        public string port = "54510";
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
@@ -108,8 +113,51 @@ namespace ShopSite
                     {
                         errString += "Phone number is not XXX-XXX-XXXX";
                     }
+                    if (errString != "")
+                    {
+                        errLbl.Text = errString;
+                    }
+                    else
+                    {
+                        try
+                        {
+                            string content;
+                            string Method = "post";
+                            string uri = "http://localhost:" + port + "/Customer/" + firstNameTxt.Text + " " + lastNameTxt.Text + " " + phoneTxt.Text; ;
 
-                errLbl.Text = errString;
+                            HttpWebRequest req = WebRequest.Create(uri) as HttpWebRequest;
+                            req.KeepAlive = false;
+                            req.Method = Method.ToUpper();
+
+                            content = firstNameTxt.Text + " " + lastNameTxt.Text + " " + phoneTxt.Text;
+
+                            byte[] buffer = Encoding.ASCII.GetBytes(content);
+                            req.ContentLength = buffer.Length;
+                            req.ContentType = "text/xml";
+                            Stream PostData = req.GetRequestStream();
+                            PostData.Write(buffer, 0, buffer.Length);
+                            PostData.Close();
+
+
+                            HttpWebResponse resp = req.GetResponse() as HttpWebResponse;
+
+                            Encoding enc = System.Text.Encoding.GetEncoding(1252);
+                            StreamReader loResponseStream =
+                            new StreamReader(resp.GetResponseStream(), enc);
+
+                            string Response = loResponseStream.ReadToEnd();
+
+
+                            loResponseStream.Close();
+                            resp.Close();
+                            errLbl.Text = Response.ToString(); //show response
+
+                        }
+                        catch (Exception ex)
+                        {
+                            errLbl.Text = ex.Message.ToString();
+                        }
+                    }
                 }
             }
             else if (prodSearch)
@@ -145,8 +193,14 @@ namespace ShopSite
                     {
                         errString += "Weight Must be a number. ";
                     }
-
-                    errLbl.Text = errString;
+                    if (errString != "")
+                    {
+                        errLbl.Text = errString;
+                    }
+                    else
+                    {
+                        
+                    }
                 }
             }
             else if (ordSearch)
