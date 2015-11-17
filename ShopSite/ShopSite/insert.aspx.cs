@@ -1,39 +1,82 @@
-﻿using System;
+﻿//File:Insert.aspx.cs
+//Programers: Frank (Thom) Taylor, Jordan Poirier, Matthew Thiessen, Tylor McLaughlin
+//Date:11-16-2015
+//Purpose: This file contains the methods to insert new data into the ShopBase database. These methods will also do some client side field validation.
+//Using statments
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using System.Web;
 using System.Web.UI;
 using System.Web.UI.WebControls;
+using System.IO;
 
 namespace ShopSite
 {
+    /// <summary>
+    /// The insert class used to insert the data
+    /// </summary>
     public partial class insert : System.Web.UI.Page
     {
+        //A regex to ensure phone number is in the correct format. 
         private static readonly Regex phoneNumber = new Regex(@"\d{3}-\d{3}-\d{4}");
         protected void Page_Load(object sender, EventArgs e)
         {
 
         }
+        /// <summary>
+        /// This method will redirect the user from the page to a youtube video. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 
         protected void Button15_Click(object sender, EventArgs e)
         {
             Response.Redirect("https://www.youtube.com/watch?v=HbW-Bnm6Ipg");
         }
+        /// <summary>
+        /// This method will redirect the user back to the home page. 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
 
         protected void backBtn_Click(object sender, EventArgs e)
         {
             Response.Redirect("home.aspx");
         }
 
+        /// <summary>
+        /// Creates a file if one does not exist. Then writes
+        /// an error log to it, including the time, the error that occured and the inccorect data.
+        /// </summary>
+        /// <param name="log">The error,time, and incorrect data sent to log</param>
+        private void WriteLog(string log)
+        {
+            string fileName = HttpContext.Current.Request.MapPath("MyLogs.txt");
+
+            using (StreamWriter sw = File.AppendText(fileName))
+            {
+                sw.WriteLine(DateTime.Now.ToString() + " " + log);
+            }
+
+        }
+        /// <summary>
+        /// This method will deal with all client side validation for the insert page. It will be triggered 
+        /// when the user trys to execute their insert. Only an insert into a single table in the data base is allowed
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void excecuteBtn_Click(object sender, EventArgs e)
         {
+            //Decleration of variables
             bool custSearch = false;
             bool prodSearch = false;
             bool ordSearch = false;
             bool cartSearch = false;
             string errString = "";
             
+           
 
         List<Panel> panels = new List<Panel>();
             panels.Add(custPnl);
@@ -71,11 +114,13 @@ namespace ShopSite
                     }
                 }
             }
+            //For searching Customer table
             if (custSearch)
             {
                 if (prodSearch || ordSearch || cartSearch)
                 {
                     errLbl.Text = "Error: You cannot search more than one table";
+                    WriteLog(errLbl.Text);
                 }
                 else
                 {
@@ -83,40 +128,61 @@ namespace ShopSite
                     if(firstNameTxt.Text == "")
                     {
                         errString += "First name cannot be blank. ";
+                        WriteLog(errLbl.Text);
                     }
                     else if(Regex.IsMatch(firstNameTxt.Text, @"\d"))
                     {
                         errString += "First name cannot have numbers. ";
+                        WriteLog("Error: " + errString + "Input: " + firstNameTxt.Text);
+                     //   WriteLog("Intput: "+firstNameTxt.Text);
                     }
 
                     //valivate last name
                     if(lastNameTxt.Text == "")
                     {
                         errString += "Last name cannot be blank. ";
+                        WriteLog(errString);
                     }
                     else if(Regex.IsMatch(lastNameTxt.Text, @"\d"))
                     {
                         errString += "Last name cannot have numbers. ";
+                        WriteLog("Error: " + errString + "Input: " + lastNameTxt.Text);
                     }
 
                     //validate phone number
                     if(phoneTxt.Text == "")
                     {
                         errString += "Phone number cannot be blank. ";
+                        WriteLog(errString);
                     }
                     else if(!phoneNumber.IsMatch(phoneTxt.Text))
                     {
                         errString += "Phone number is not XXX-XXX-XXXX";
+                        WriteLog("Error: " + errString + "Input: " + phoneTxt.Text);
+                    }
+//Thom makes changes
+                    if (errString != "")
+                    {
+                        errLbl.Text = errString;
+                    }
+                    else
+                    {
+                        //format get string
+                        string getCustString = "Customer" + "/" + "firstName" + ":" + firstNameTxt.Text + "," + "lastName" + ":" + lastNameTxt.Text + "," + "phoneNumber" + ":" + phoneTxt.Text;
+
+                        errLbl.Text = getCustString;
                     }
 
-                errLbl.Text = errString;
                 }
             }
+
+          //For serching Product Table
             else if (prodSearch)
             {
                 if (custSearch || ordSearch || cartSearch)
                 {
                     errLbl.Text = "Error: You cannot search more than one table";
+                    WriteLog(errString);
                 }
                 else
                 {
@@ -124,36 +190,55 @@ namespace ShopSite
                     if (prodNameTxt.Text == "")
                     {
                         errString += "Product name cannot be blank. ";
+                        WriteLog(errString);
                     }
   
                     //valivate price
                     if (priceTxt.Text == "")
                     {
                         errString += "price cannot be blank. ";
+                        WriteLog(errString);
                     }
                     else if (!Regex.IsMatch(priceTxt.Text, @"^[1-9]\d*(\.\d+)?$"))
                     {
                         errString += "must be a valid price with numbers and decimal only X.XX. ";
+                        WriteLog("Error: " + errString + "Input: " + priceTxt.Text);
                     }
 
                     //validate product weight
                     if (prodWeightTxt.Text == "")
                     {
                         errString += "Product weight cannot be blank. ";
+                        WriteLog(errString);
                     }
                     else if (!Regex.IsMatch(prodWeightTxt.Text, @"^[1-9]\d*(\.\d+)?$"))
                     {
                         errString += "Weight Must be a number. ";
+                        WriteLog("Error: " + errString + "Input: " + prodWeightTxt.Text);
                     }
-
-                    errLbl.Text = errString;
+  //Thom starts changes
+                    if (errString != "")
+                    {
+                        errLbl.Text = errString;
+                    }
+                    else
+                    {
+                        //format get  string
+                        string getProdString = "Product" + "/" + "prodName" + ":" + prodNameTxt.Text + "," + "price" + ":" + priceTxt.Text + "," + "prodWeight" + ":" + prodWeightTxt.Text;
+                        errLbl.Text = getProdString;
+                    }
+                   // errLbl.Text = errString;
                 }
             }
+
+                //For serching Order Table
+
             else if (ordSearch)
             {
                 if (prodSearch || custSearch || cartSearch)
                 {
                     errLbl.Text = "Error: You cannot search more than one table. ";
+                    WriteLog(errLbl.Text);
                 }
                 else
                 {
@@ -161,10 +246,12 @@ namespace ShopSite
                     if (ordCustIDTxt.Text == "")
                     {
                         errString += "custID cannot be blank. ";
+                        WriteLog(errString);
                     }
-                    else if(!Regex.IsMatch(ordCustIDTxt.Text, @"^[1-9]?$"))
+                    else if(!Regex.IsMatch(ordCustIDTxt.Text, "^[1-9]*$"))
                     {
                         errString += "custID can only have numbers. ";
+                        WriteLog("Error: " + errString + "Input: " + ordCustIDTxt.Text);
                     }
 
                     DateTime temp;
@@ -173,20 +260,43 @@ namespace ShopSite
                     if (orderDateTxt.Text == "")
                     {
                         errString += "order date cannot be blank. ";
+                        WriteLog(errString);
                     }
                     else if (!DateTime.TryParseExact(orderDateTxt.Text, format, System.Globalization.CultureInfo.InvariantCulture, System.Globalization.DateTimeStyles.NoCurrentDateDefault, out temp))
                     {
                         errString += "date must be in MM-DD-YY format. ";
+                        WriteLog("Error: " + errString + "Input: " + orderDateTxt.Text);
                     }
+ //Thom makes changes
+                    if (errString != "")
+                    {
+                        errLbl.Text = errString;
+                    }
+                    else
+                    {
+                        //format get string
+                       
+                        string getOrdString = "Order" + "/" + "custID" + ":" + ordCustIDTxt.Text + ",";
+                        //Check to see if
+                        if(poNumberTxt.Text != "")
+                        {
+                            getOrdString += "poNumber" + ":" + poNumberTxt.Text + ",";
+                        }
+                         getOrdString += "orderDate" + ":" + orderDateTxt.Text;
+                        errLbl.Text = getOrdString;
 
-                    errLbl.Text = errString;
+                    }
+                   // errLbl.Text = errString;
                 }
             }
+
+                //For serching Cart table
             else if (cartSearch)
             {
                 if (prodSearch || ordSearch || custSearch)
                 {
                     errLbl.Text = "Error: You cannot search more than one table";
+                    WriteLog(errLbl.Text);
                 }
                 else
                 {
@@ -195,9 +305,10 @@ namespace ShopSite
                     {
                         errString += "prodID cannot be blank. ";
                     }
-                    else if (!Regex.IsMatch(cartProdIDTxt.Text, @"^[1-9]?$"))
+                    else if (!Regex.IsMatch(cartProdIDTxt.Text, "^[1-9]*$"))
                     {
                         errString += "prodID can only have numbers. ";
+                        WriteLog("Error: " + errString + "Input: " + cartProdIDTxt.Text);
                     }
 
 
@@ -205,18 +316,30 @@ namespace ShopSite
                     int i = 0;
                     if (quantityTxt.Text == "")
                     {
-                        errString += "order date cannot be blank. ";
+                        errString += "quantity cannot be blank. ";
+                        WriteLog(errString);
                     }
                     else if (!int.TryParse(quantityTxt.Text, out i))
                     {
-                        errString += "order date must be an integer. ";
+                        errString += "quantity must be an integer. ";
+                        WriteLog("Error: " + errString + "Input: " + quantityTxt.Text);
                     }
+ //Thom makes changes
+                    if (errString != "")
+                    {
+                        errLbl.Text = errString;
+                    }
+                    else
+                    {
 
-                    errLbl.Text = errString;
+                        //format get sting
+                         string getCartString = "Cart" + "/" + "prodID" + ":" + cartProdIDTxt.Text + "," + "quantity" + ":" + quantityTxt.Text;
+                        errLbl.Text = getCartString;
+                    }
+                    
+                   // errLbl.Text = errString;
                 }
             }
         }
-
-
     }
 }
