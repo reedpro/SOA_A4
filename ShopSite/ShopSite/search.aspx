@@ -28,7 +28,7 @@
     <p style="text-align: center">
         </p>
         <p style="text-align: center">
-            &nbsp;&nbsp;<asp:Label ID="errLbl" runat="server" ForeColor="Red"></asp:Label>
+             <asp:Label ID="errLbl" runat="server" ForeColor="Red"></asp:Label>
         </p>
         <asp:Panel ID="Panel1" runat="server" Style="left: 50%; margin-left: 432px; text-align: center;" Width="579px" BorderStyle="Solid">
             <asp:CheckBox ID="CheckBox1" runat="server"  TextAlign="Left" Text="Please generate a Purchase Order (P.O)" />

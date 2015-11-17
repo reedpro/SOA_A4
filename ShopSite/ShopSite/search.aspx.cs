@@ -1,4 +1,12 @@
-﻿using System;
+﻿//File:         search.aspx.cs
+//Description:  This lets you search by validating and then sending the data to the server through the rest webmethod
+//Programmers:  Jordan Poirier, Matthew Thiessen, Thom Taylor, Tylor Mclaughlin
+//Date:         11/16/2015
+
+
+
+
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Web.UI;
@@ -12,24 +20,32 @@ namespace ShopSite
     public partial class search : System.Web.UI.Page
     {
         private static readonly Regex phoneNumber = new Regex(@"\d{3}-\d{3}-\d{4}");
+
+
         protected void Page_Load(object sender, EventArgs e)
         {
 
         }
 
+        //Method:       Button15_click
+        //Description:  "Get me out of here" button, leaves the website
         protected void Button15_Click(object sender, EventArgs e)
         {
             Response.Redirect("https://www.youtube.com/watch?v=dQw4w9WgXcQ");
         }
 
+        //Method:       backBtn_Click
+        //Description:  returns to home page
         protected void backBtn_Click(object sender, EventArgs e)
         {
             Response.Redirect("home.aspx");
         }
 
-
+        //Method:       excecuteBtn_Click
+        //Description:  excecutes search along with error checking
         protected void excecuteBtn_Click(object sender, EventArgs e)
         {
+            //variables
             bool custSearch = false;
             bool prodSearch = false;
             bool ordSearch = false;
@@ -43,14 +59,16 @@ namespace ShopSite
             panels.Add(orderPnl);
             panels.Add(cartPnl);
 
+            //check each panel to see if any of them have a textbox that isnt empty
             foreach (Panel p in panels)
             {
-
+                //check each text box
                 foreach (Control t in p.Controls)
                 {
                     if (t is TextBox)
                     {
                         TextBox tx = (TextBox)t;
+                        //if text box isnt blank set appropriat bool true
                         if (tx.Text != "")
                         {
                             if (p.ID == "custPnl")
@@ -73,28 +91,31 @@ namespace ShopSite
                     }
                 }
             }
+            //if customer search is true and no other table is true
             if (custSearch)
             {
                 if (prodSearch || ordSearch || cartSearch)
                 {
+                    //add to error string
                     errLbl.Text = "Error: You cannot search more than one table";
                 }
                 else //then we are doing a customer search. build get string
                 {
+                    //check custID to see if it is valid and non-blank
                     if (custIDTxt.Text != "" && Regex.IsMatch(custIDTxt.Text, @"^[1-9]?$"))
                     {
                         getString += "custID:" + custIDTxt.Text;
-                    }
-                    else if (!Regex.IsMatch(custIDTxt.Text, @"^[1-9]?$"))
+                    } 
+                    else if (!Regex.IsMatch(custIDTxt.Text, @"^[1-9]?$")) //if it is non-blank and invalid add to error string
                     {
                         errMsg += "customer ID must be numeric. ";
                     }
-
+                    //check first name for valid non blank
                     if (firstNameTxt.Text != "" && !Regex.IsMatch(firstNameTxt.Text, @"\d"))
                     {
                         if (getString != "")
                         {
-                            getString += ",";
+                            getString += ","; //add comma to "get" string
                         }
                         getString += "firstName:" + firstNameTxt.Text;
                     }
@@ -102,7 +123,7 @@ namespace ShopSite
                     {
                         errMsg += "first name must not be numeric. ";
                     }
-
+                    //lastname
                     if (lastNameTxt.Text != "" && !Regex.IsMatch(lastNameTxt.Text, @"\d"))
                     {
                         if (getString != "")
@@ -115,7 +136,7 @@ namespace ShopSite
                     {
                         errMsg += "last name must not be numeric. ";
                     }
-
+                    //phone number
                     if (phoneTxt.Text != "" && phoneNumber.IsMatch(phoneTxt.Text))
                     {
                         if (getString != "")
@@ -128,17 +149,56 @@ namespace ShopSite
                     {
                         errMsg += "Phone number must be XXX-XXX-XXXX. ";
                     }
+
+                    //if error message isnt blank, display error
                     if (errMsg != "")
                     {
                         errLbl.Text = errMsg;
                     }
-                    else
+                    else //otherwise connect to rest service
                     {
-                        var client = new RestSharp.RestClient("http://10.113.21.144//");
-                        var request = new RestSharp.RestRequest("/webservice/shoppService.asmx/HelloWorld", RestSharp.Method.GET);
-                        client.Execute(request);
-                        RestSharp.RestResponse response = client.Execute(request);
-                        var content = response.Content;
+                        try
+                        {
+                            string content;
+                            string Method = "get";
+                            string uri = "http://localhost:54510/RestService"; 
+
+                            HttpWebRequest req = WebRequest.Create(uri) as HttpWebRequest;
+                            req.KeepAlive = false;
+                            req.Method = Method.ToUpper();
+
+                            //if (("POST,PUT").Split(',').Contains(Method.ToUpper()))
+                            //{
+                            //    Console.WriteLine("Enter XML FilePath:");
+                            //    string FilePath = Console.ReadLine();
+                            //    content = (File.OpenText(@FilePath)).ReadToEnd();
+
+                            //    byte[] buffer = Encoding.ASCII.GetBytes(content);
+                            //    req.ContentLength = buffer.Length;
+                            //    req.ContentType = "text/xml";
+                            //    Stream PostData = req.GetRequestStream();
+                            //    PostData.Write(buffer, 0, buffer.Length);
+                            //    PostData.Close();
+                            //}
+
+                            HttpWebResponse resp = req.GetResponse() as HttpWebResponse;
+
+                            Encoding enc = System.Text.Encoding.GetEncoding(1252);
+                            StreamReader loResponseStream =
+                            new StreamReader(resp.GetResponseStream(), enc);
+
+                            string Response = loResponseStream.ReadToEnd();
+
+
+                            loResponseStream.Close();
+                            resp.Close();
+                            errLbl.Text = Response.ToString(); //show response
+                            
+                        }
+                        catch (Exception ex)
+                        {
+                            errLbl.Text = ex.Message.ToString();
+                        }
                     }
                     //getString;
                 }
@@ -181,7 +241,7 @@ namespace ShopSite
                         }
                         getString += "price:" + priceTxt.Text;
                     }
-                    else if (Regex.IsMatch(lastNameTxt.Text, @"^[1-9]\d*(\.\d+)?$"))
+                    else if (Regex.IsMatch(priceTxt.Text, @"^[1-9]\d*(\.\d+)?$"))
                     {
                         errMsg += "price be numeric. ";
                     }
@@ -196,9 +256,12 @@ namespace ShopSite
                     }
                     else if (!Regex.IsMatch(prodWeightTxt.Text, @"^[1-9]\d*(\.\d+)?$"))
                     {
-                        errMsg += "Product weight must be a numbe.r ";
+                        errMsg += "Product weight must be a number. ";
                     }
-                    errLbl.Text = errMsg + "\n" + getString;
+                    if (errMsg != "")
+                    {
+                        errLbl.Text = errMsg + "\n" + getString;
+                    }
                 }
             }
             else if (ordSearch)
@@ -237,7 +300,10 @@ namespace ShopSite
                         {
                             getString += ",";
                         }
-                        getString += "poNumber:" + poNumberTxt.Text;
+                        if (errMsg != "")
+                        {
+                            getString += "poNumber:" + poNumberTxt.Text;
+                        }
                     }
 
                     DateTime temp;
